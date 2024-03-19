@@ -1,6 +1,7 @@
 import plotly.express as px
 import seaborn as sns
-from shiny.express import input, ui, render
+from shiny.express import input, ui
+from shiny import render, reactive
 from shinywidgets import render_plotly, render_widget
 import palmerpenguins
 
@@ -37,10 +38,12 @@ with ui.layout_columns():
         @render.data_frame  
         def penguins_df():
             return render.DataTable(penguins) 
+    
     with ui.card():
         @render.data_frame  
         def penguins_dg():
-            return render.DataGrid(penguins)     
+            return render.DataGrid(penguins) 
+    
     
 with ui.layout_columns(): 
     
@@ -77,4 +80,18 @@ with ui.layout_columns():
             },
             size_max=8, # set the maximum marker size
         )
+
+# --------------------------------------------------------
+# Reactive calculations and effects
+# --------------------------------------------------------
+
+# Add a reactive calculation to filter the data
+# By decorating the function with @reactive, we can use the function to filter the data
+# The function will be called whenever an input functions used to generate that output changes.
+# Any output that depends on the reactive function (e.g., filtered_data()) will be updated when the data changes.
+
+@reactive.calc
+def filtered_data():
+    return penguins_df
+
         
