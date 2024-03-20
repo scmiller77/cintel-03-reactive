@@ -9,6 +9,10 @@ penguins = palmerpenguins.load_penguins()
 
 ui.page_opts(title="Smiller's Penguin Report", fillable=True)
 
+@reactive.calc
+def filtered_data():
+    return penguins
+
 with ui.sidebar(open="open"):
     # Add a second-level header to the sidebar
     ui.h2("Sidebar")
@@ -50,7 +54,7 @@ with ui.layout_columns():
     @render_widget  
     def plot1():  
         scatterplot = px.histogram(
-            data_frame=penguins,
+            data_frame=filtered_data(),
             x=input.selected_attribute(),
             nbins=input.plotly_bin_count(),
         ).update_layout(
@@ -61,7 +65,7 @@ with ui.layout_columns():
 
     @render.plot(alt="A Seaborn histogram on penguin body mass in grams.")  
     def plot2():  
-        ax = sns.histplot(data=penguins, x=input.selected_attribute(), bins=input.seaborn_bin_count())  
+        ax = sns.histplot(data=filtered_data(), x=input.selected_attribute(), bins=input.seaborn_bin_count())  
         ax.set_title("Palmer Penguins - Seaborn")
         ax.set_ylabel("Value")
         return ax  
@@ -69,7 +73,7 @@ with ui.layout_columns():
     @render_plotly
     def plotly_scatterplot():
         return px.scatter(
-            penguins,
+            filtered_data(),
             x="bill_length_mm",
             y="body_mass_g",
             color="species",
@@ -81,17 +85,7 @@ with ui.layout_columns():
             size_max=8, # set the maximum marker size
         )
 
-# --------------------------------------------------------
-# Reactive calculations and effects
-# --------------------------------------------------------
 
-# Add a reactive calculation to filter the data
-# By decorating the function with @reactive, we can use the function to filter the data
-# The function will be called whenever an input functions used to generate that output changes.
-# Any output that depends on the reactive function (e.g., filtered_data()) will be updated when the data changes.
 
-@reactive.calc
-def filtered_data():
-    return penguins_df
 
         
